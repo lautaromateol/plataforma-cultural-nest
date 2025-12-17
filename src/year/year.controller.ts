@@ -34,7 +34,7 @@ export class YearController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async getYear(@Param() id: string) {
+  async getYear(@Param("id") id: string) {
     return await this.yearService.getYear(id);
   }
 
@@ -48,13 +48,13 @@ export class YearController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ZodValidationPipe(updateYearSchema))
-  async updateYear(@Param() id: string, @Body() yearData: UpdateYearDto) {
+  async updateYear(@Param("id") id: string, @Body() yearData: UpdateYearDto) {
     return await this.yearService.updateYear({ id, yearData });
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async deleteYear(@Param() id: string) {
+  async deleteYear(@Param("id") id: string) {
     return await this.yearService.deleteYear(id);
   }
 }
