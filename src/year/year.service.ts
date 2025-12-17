@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -11,7 +12,9 @@ export class YearService {
   constructor(private prisma: PrismaService) {}
 
   async getYears() {
-    return await this.prisma.year.findMany();
+    return await this.prisma.year.findMany({
+      orderBy: { level: "asc" }
+    });
   }
 
   async getYear(id: string) {
@@ -29,6 +32,16 @@ export class YearService {
   }
 
   async createYear(yearData: CreateYearDto) {
+    const existingYear = await this.prisma.year.findFirst({
+      where: {
+        OR: [{ level: yearData.level }, { name: yearData.name }]
+      }
+    })
+
+    if(existingYear) {
+      throw new BadRequestException("Ya existe un año con ese nivel o nombre.")
+    }
+
     const dbYear = await this.prisma.year.create({
       data: {
         ...yearData,
