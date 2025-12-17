@@ -27,3 +27,10 @@ enum UserRole {
   TEACHER
   STUDENT
 }
+
+model Year {
+  id          String  @id @default(cuid())
+  level       Int     @unique
+  name        String  @unique
+  description String?
+}
