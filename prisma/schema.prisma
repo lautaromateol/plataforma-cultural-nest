@@ -53,5 +53,6 @@ model Course {
   yearId String
   year   Year   @relation(fields: [yearId], references: [id], onDelete: Cascade)
 
+  @@unique([name, academicYear])
   @@map("courses")
 }
