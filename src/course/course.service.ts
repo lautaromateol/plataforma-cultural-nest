@@ -46,33 +46,33 @@ export class CourseService {
   }
 
   async createCourse(courseData: CreateCourseDto) {
-    const existingCourse = await this.prisma.course.findFirst({
-      where: {
-        name: courseData.name,
-        academicYear: courseData.academicYear,
-        yearId: courseData.yearId,
-      },
-    });
+    try {
+      const existingCourse = await this.prisma.course.findFirst({
+        where: {
+          name: courseData.name,
+          academicYear: courseData.academicYear,
+          yearId: courseData.yearId,
+        },
+      });
 
-    if (existingCourse) {
-      throw new BadRequestException(
-        `Ya existe un curso llamado ${courseData.name} en el año academico ${courseData.academicYear} perteneciente a este nivel`,
-      );
-    }
+      if (existingCourse) {
+        throw new BadRequestException(
+          `Ya existe un curso llamado ${courseData.name} en el año academico ${courseData.academicYear} perteneciente a este nivel`,
+        );
+      }
 
-    const dbCourse = await this.prisma.course.create({
-      data: {
-        ...courseData,
-      },
-    });
+      const dbCourse = await this.prisma.course.create({
+        data: {
+          ...courseData,
+        },
+      });
 
-    if (!dbCourse) {
+      return { dbCourse, message: 'Curso creado exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar crear el curso. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbCourse;
   }
 
   async updateCourse({
@@ -82,37 +82,36 @@ export class CourseService {
     courseData: UpdateCourseDto;
     id: string;
   }) {
-    const dbCourse = await this.prisma.course.update({
-      where: {
-        id,
-      },
-      data: {
-        ...courseData,
-      },
-    });
-
-    if (!dbCourse) {
+    try {
+      const dbCourse = await this.prisma.course.update({
+        where: {
+          id,
+        },
+        data: {
+          ...courseData,
+        },
+      });
+      return { dbCourse, message: 'Curso actualizado exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar actualizar el curso. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbCourse;
   }
 
   async deleteCourse(id: string) {
-    const dbCourse = await this.prisma.course.delete({
-      where: {
-        id,
-      },
-    });
+    try {
+      const dbCourse = await this.prisma.course.delete({
+        where: {
+          id,
+        },
+      });
 
-    if (!dbCourse) {
+      return { dbCourse, message: 'Curso eliminado exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar eliminar el curso. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbCourse;
   }
 }

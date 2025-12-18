@@ -42,29 +42,31 @@ export class SubjectService {
   }
 
   async createSubject(subjectData: CreateSubjectDto) {
-    const year = await this.prisma.year.findUnique({
-      where: {
-        id: subjectData.yearId,
-      },
-    });
+    try {
+      const year = await this.prisma.year.findUnique({
+        where: {
+          id: subjectData.yearId,
+        },
+      });
 
-    if (!year) {
-      throw new NotFoundException(
-        'No se encontró un año con el ID proporcionado.',
-      );
-    }
+      if (!year) {
+        throw new NotFoundException(
+          'No se encontró un año con el ID proporcionado.',
+        );
+      }
 
-    const code = `${subjectData.name.slice(0, 3).toUpperCase()}-${year.level}`;
+      const code = `${subjectData.name.slice(0, 3).toUpperCase()}-${year.level}`;
 
-    const subject = await this.prisma.subject.create({
-      data: {
-        ...subjectData,
-        yearId: year.id,
-        code,
-      },
-    });
+      const dbSubject = await this.prisma.subject.create({
+        data: {
+          ...subjectData,
+          yearId: year.id,
+          code,
+        },
+      });
 
-    if (!subject) {
+      return { dbSubject, message: 'Materia creada exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al crear la materia. Intenta de nuevo mas tarde',
       );
@@ -78,37 +80,37 @@ export class SubjectService {
     subjectData: UpdateSubjectDto;
     id: string;
   }) {
-    const dbSubject = await this.prisma.subject.update({
-      where: {
-        id,
-      },
-      data: {
-        ...subjectData,
-      },
-    });
+    try {
+      const dbSubject = await this.prisma.subject.update({
+        where: {
+          id,
+        },
+        data: {
+          ...subjectData,
+        },
+      });
 
-    if (!dbSubject) {
+      return { dbSubject, message: 'Materia actualizada exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar actualizar la materia. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbSubject;
   }
 
   async deleteSubject(id: string) {
-    const dbSubject = await this.prisma.subject.delete({
-      where: {
-        id,
-      },
-    });
+    try {
+      const dbSubject = await this.prisma.subject.delete({
+        where: {
+          id,
+        },
+      });
 
-    if (!dbSubject) {
+      return { dbSubject, message: 'Materia eliminada exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar eliminar la materia. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbSubject;
   }
 }

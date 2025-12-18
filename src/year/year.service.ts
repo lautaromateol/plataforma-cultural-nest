@@ -13,7 +13,7 @@ export class YearService {
 
   async getYears() {
     return await this.prisma.year.findMany({
-      orderBy: { level: "asc" }
+      orderBy: { level: 'asc' },
     });
   }
 
@@ -32,63 +32,65 @@ export class YearService {
   }
 
   async createYear(yearData: CreateYearDto) {
-    const existingYear = await this.prisma.year.findFirst({
-      where: {
-        OR: [{ level: yearData.level }, { name: yearData.name }]
+    try {
+      const existingYear = await this.prisma.year.findFirst({
+        where: {
+          OR: [{ level: yearData.level }, { name: yearData.name }],
+        },
+      });
+
+      if (existingYear) {
+        throw new BadRequestException(
+          'Ya existe un año con ese nivel o nombre.',
+        );
       }
-    })
 
-    if(existingYear) {
-      throw new BadRequestException("Ya existe un año con ese nivel o nombre.")
-    }
+      const dbYear = await this.prisma.year.create({
+        data: {
+          ...yearData,
+        },
+      });
 
-    const dbYear = await this.prisma.year.create({
-      data: {
-        ...yearData,
-      },
-    });
-
-    if (!dbYear) {
+      return { dbYear, message: 'Año creado exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar crear el año. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbYear;
   }
 
   async updateYear({ yearData, id }: { yearData: UpdateYearDto; id: string }) {
-    const dbYear = await this.prisma.year.update({
-      where: {
-        id,
-      },
-      data: {
-        ...yearData,
-      },
-    });
+    try {
+      const dbYear = await this.prisma.year.update({
+        where: {
+          id,
+        },
+        data: {
+          ...yearData,
+        },
+      });
 
-    if (!dbYear) {
+      return { dbYear, message: 'Año actualizado exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar actualizar el año. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbYear;
   }
 
   async deleteYear(id: string) {
-    const dbYear = await this.prisma.year.delete({
-      where: {
-        id,
-      },
-    });
+    try {
+      const dbYear = await this.prisma.year.delete({
+        where: {
+          id,
+        },
+      });
 
-    if (!dbYear) {
+      return { dbYear, message: 'Año eliminado exitosamente.' };
+    } catch (error) {
       throw new InternalServerErrorException(
         'Hubo un error al intentar eliminar el año. Intenta de nuevo mas tarde.',
       );
     }
-
-    return dbYear;
   }
 }
