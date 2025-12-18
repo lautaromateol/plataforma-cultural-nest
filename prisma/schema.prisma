@@ -21,6 +21,8 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
+  subjectCourses CourseSubject[]
+
   @@map("users")
 }
 
@@ -51,8 +53,9 @@ model Course {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  yearId String
-  year   Year   @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  yearId         String
+  year           Year            @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  subjectCourses CourseSubject[]
 
   @@unique([name, academicYear])
   @@map("courses")
@@ -66,9 +69,29 @@ model Subject {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  yearId String
-  year   Year   @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  yearId         String
+  year           Year            @relation(fields: [yearId], references: [id], onDelete: Cascade)
+  subjectCourses CourseSubject[]
 
   @@unique([name, yearId])
   @@map("subjects")
+}
+
+model CourseSubject {
+  id        String   @id @default(cuid())
+  schedule  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  teacherId String?
+  teacher   User?   @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, subjectId])
+  @@map("course_subjects")
 }
