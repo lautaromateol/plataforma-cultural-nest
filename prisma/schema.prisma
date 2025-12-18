@@ -36,7 +36,8 @@ model Year {
   name        String  @unique
   description String?
 
-  courses Course[]
+  courses  Course[]
+  subjects Subject[]
 
   @@map("years")
 }
@@ -55,4 +56,19 @@ model Course {
 
   @@unique([name, academicYear])
   @@map("courses")
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String
+  code        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  yearId String
+  year   Year   @relation(fields: [yearId], references: [id], onDelete: Cascade)
+
+  @@unique([name, yearId])
+  @@map("subjects")
 }
