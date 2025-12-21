@@ -7,10 +7,20 @@ import { YearModule } from './year/year.module';
 import { SubjectModule } from './subject/subject.module';
 import { CourseModule } from './course/course.module';
 import { CourseSubjectModule } from './course-subject/course-subject.module';
+import { EnrollmentModule } from './enrollment/enrollment.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [AuthModule, UserModule, YearModule, CourseModule, SubjectModule, CourseSubjectModule, PrismaModule],
+  imports: [
+    AuthModule,
+    UserModule,
+    YearModule,
+    CourseModule,
+    SubjectModule,
+    CourseSubjectModule,
+    EnrollmentModule,
+    PrismaModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
