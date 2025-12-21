@@ -22,6 +22,7 @@ model User {
   updatedAt         DateTime @updatedAt
 
   courseSubjects CourseSubject[]
+  enrollments    Enrollment[]
 
   @@map("users")
 }
@@ -56,6 +57,7 @@ model Course {
   yearId         String
   year           Year            @relation(fields: [yearId], references: [id], onDelete: Cascade)
   courseSubjects CourseSubject[]
+  enrollments    Enrollment[]
 
   @@unique([name, academicYear])
   @@map("courses")
@@ -94,4 +96,27 @@ model CourseSubject {
 
   @@unique([courseId, subjectId])
   @@map("course_subjects")
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+  TRANSFERRED
+}
+
+model Enrollment {
+  id        String           @id @default(cuid())
+  status    EnrollmentStatus @default(ACTIVE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  studentId String
+  student   User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+  @@map("enrollments")
 }
