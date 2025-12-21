@@ -14,6 +14,13 @@ export class YearService {
   async getYears() {
     return await this.prisma.year.findMany({
       orderBy: { level: 'asc' },
+      include: {
+        _count: {
+          select: {
+            courses: true,
+          },
+        },
+      },
     });
   }
 
